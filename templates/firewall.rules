@@ -1,0 +1,24 @@
+# =============================================================================
+# Reglas de UFW. Formato por línea:   <ámbito> <argumentos de "ufw">
+#   ámbito "base" : siempre se aplica
+#   ámbito "nfs"  : solo si ENABLE_NFS=yes
+# @@LAN@@ se reemplaza por cada red de LAN_CIDR (una regla por red).
+# Las líneas que empiezan con # se ignoran.
+# =============================================================================
+
+# SSH abierto desde cualquier origen (evita quedarte sin acceso remoto).
+base allow 22/tcp
+
+# Samba: descubrimiento de nombres (UDP 137/138), sesión (TCP 139) y SMB (TCP 445).
+base allow from @@LAN@@ to any port 137,138 proto udp
+base allow from @@LAN@@ to any port 139,445 proto tcp
+
+# NFS: portmapper (111) y servicio NFS (2049).
+nfs allow from @@LAN@@ to any port 111 proto tcp
+nfs allow from @@LAN@@ to any port 111 proto udp
+nfs allow from @@LAN@@ to any port 2049 proto tcp
+nfs allow from @@LAN@@ to any port 2049 proto udp
+
+# Política por defecto: bloquear entradas no listadas, permitir salidas.
+base default deny incoming
+base default allow outgoing
